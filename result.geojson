@@ -1,4 +1,4 @@
-{'features': [{'geometry': {'coordinates': [-46.6333824, -23.5506507],
+[{'features': [{'geometry': {'coordinates': [-46.6333824, -23.5506507],
     'type': 'Point'},
    'properties': {'city': 'São Paulo', 'qde': 42},
    'type': 'Feature'},
@@ -589,4 +589,4 @@
   {'geometry': {'coordinates': [-56.1913095, -34.9058916], 'type': 'Point'},
    'properties': {'city': 'Montevidéu', 'qde': 1},
    'type': 'Feature'}],
- 'type': 'FeatureCollection'}
+ 'type': 'FeatureCollection'}]
