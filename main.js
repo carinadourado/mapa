@@ -591,26 +591,29 @@ const geo_data = {'features': [{'geometry': {'coordinates': [-46.6333824, -23.55
 'type': 'Feature'}],
 'type': 'FeatureCollection'}
 
-const valores_qde = geo_data.features.map(d => d.properties.qde); // gera uma lista com os valores da minha propriedade/variável numérica no meu geojson (no meu caso aqui, ela se chama 'qde')
+//lista com os valores da qde do geojson 
+const valores_qde = geo_data.features.map(d => d.properties.qde); 
+// calcula a qde mínima (para usar nas bolhas no mapa)
+const min_qde = Math.min(...valores_qde); 
+// calcula a qde máxima (para usar nas bolhas no mapa)
+const max_qde = Math.max(...valores_qde);  
 
-const min_qde = Math.min(...valores_qde); // calcula a qde mínima
-const max_qde = Math.max(...valores_qde); // calcula a qde máxima. vou usar esses dois valores na interpolação dos raios das bolhas.
-
-console.log(valores_qde, min_qde, max_qde);
-
+//token de acesso ao mapa no mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2FyaW5hZG91cmFkbyIsImEiOiJjbDR6b3hxYjEzYWZiM2JxY2RqNGNwMnJuIn0.Hceotfxx7AomJceWsde1JA';
 
+//função do mapbox que chama o mapa e definie ponto central e zoom
 let map = new mapboxgl.Map({
   container: 'map', // container id
-  style: 'mapbox://styles/carinadourado/cl4xg6nwv004p15q9kqmzbziw', // stylesheet location
-  center: [-23.4, 8.8], // starting position [lng, lat]
-  zoom: 2,// starting zoom
+  style: 'mapbox://styles/carinadourado/cl4xg6nwv004p15q9kqmzbziw',
+  center: [-23.4, 8.8], 
+  zoom: 2,
   pitch: 0,
  });
 
-// //desabilita o scroll zoom do mapa
+//desabilita o scroll zoom do mapa
 map.scrollZoom.disable();
 
+//insere as bolhas no mapa
 map.on('load', () => {
   map.addSource('src-bolhas', {
     'type': 'geojson',
@@ -631,7 +634,6 @@ map.on('load', () => {
         ['sqrt', ['get', 'qde']], // que vai ser a raiz quadrada do valor de 'qde', uma propriedade/variável presente nos dados
         
         [
-          
           'interpolate', // declara a interpolação
           ['linear'], // do tipo linear
           ['var', 'raiz_quadrada_qde'], // com base na "variável" 'raiz_quadrada_qde', que declaramos acima
@@ -644,18 +646,15 @@ map.on('load', () => {
 })
 
 
-  //site: https://docs.mapbox.com/mapbox-gl-js/example/scroll-fly-to/
-
-//--------------------------------------------------------------------
-
 //Criar função para escutar gatilho chegar no topo da página
 function escutaScroll(){
+  
   //Pega a lista de gatilhos
   let gatilhos = document.querySelectorAll('.gatilhos > div');
 
-
   //Fazer o loop
   for (let gatilho of gatilhos){
+    
     //para cada um deles, pegar a posição atual
     let posicao = gatilho.getBoundingClientRect();
 
@@ -664,24 +663,20 @@ function escutaScroll(){
    
     //verifique se o gatilho está acima do topo da página
     if(posicao.top <= 0 && posicao.top > -posicao.height){
-
+      
+      //se sim, torna a opacidade visível
       gatilho.style.opacity = 1
-    
-      if (alvo == "passo-0"){
-        map.flyTo({
-          center: [-23.4, 8.8],
+      
+      //Se o alvo estiver passando pela classe "passo-1"
+      if (alvo == "passo-1"){ 
+                map.flyTo({
+          center: [-23.4, 8.8], //mapa permanece onde está
           zoom: 2,
           pitch: 0
         })
       }
       
-      if (alvo == "passo-1"){
-        map.flyTo({
-          center: [-23.4, 8.8],
-          zoom: 2,
-          pitch: 0
-        })
-      }
+      //Se o alvo estiver passando pela classe "passo-2"
       if(alvo == "passo-2"){
         //faça o mapa viajar até Resende-RJ
         map.flyTo({
@@ -690,41 +685,30 @@ function escutaScroll(){
             pitch: 20
         })
 
-        //adiciona a classe "passo-ativo"
-        passo.classList.add('passo-ativo');
-
-      }else if(alvo == "passo-3"){  //Se o alvo estiver passando pela classe "passo-2"
+      //Se o alvo estiver passando pela classe "passo-3"
+      }else if(alvo == "passo-3"){  
         //faça o mapa viajar até São Francisco do Sul-SC
         map.flyTo({
           center: [-48.6308087, -26.2495087], 
           zoom: 13,
           pitch: 20
         })
-
-        //adiciona a classe "passo-ativo"
-        passo.classList.add('passo-ativo');
-      }else if(alvo == "passo-4"){ //Se o alvo estiver passando pela classe "passo-3"
+        
+      //Se o alvo estiver passando pela classe "passo-4"
+      }else if(alvo == "passo-4"){ 
         //faça o mapa viajar até Abu Dhabi - Emirados Árabes
         map.flyTo({
           center: [54.3774014, 24.4538352],
           zoom: 11,
           pitch: 20
         })
-
-        //adiciona a classe "passo-ativo"
-        passo.classList.add('passo-ativo');
       }else{
-
-        // caso contrário, retire a classe "passo-ativo"
-        passo.classList.remove('passo-ativo');
         //Volte para a configuração original
         map.flyTo({
           center: [-23.4, 8.8],
           zoom: 2,
           pitch: 0
         })
-        gatilho.style.opacity = 0
-
       }
     }
   }
